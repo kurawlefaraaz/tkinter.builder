@@ -52,7 +52,7 @@ def create_widget(
     return widget
 
 def get_defaults(widget):
-    wclass = getattr(tk, widget.winfo_class())
+    wclass = widget.__class__
     mgr = widget.winfo_manager()
 
     if wclass != tk.OptionMenu:
