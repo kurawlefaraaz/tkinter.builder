@@ -12,7 +12,7 @@ class MethodWindow(Toplevel):
 
         MenuBar(self)
 
-        WidgetCatalog(self)
+        self.catalog = WidgetCatalog(self)
     
     def deiconify(self):
         self.nametowidget('.').nametowidget("raise_method_window").destroy()
@@ -21,4 +21,4 @@ class MethodWindow(Toplevel):
     
     def withdraw(self):
         super().withdraw()
-        Button(self.master, name= "raise_method_window", text=self.title(), font="courier 8 bold",command=self.deiconify, anchor="n").place(x=0, y=0,)
+        Button(self.master, name= "raise_method_window", text=self.title(), font="courier 7 bold",command=self.deiconify, anchor="n").place(x=0, y=0, relx=0,rely=1, anchor="sw")

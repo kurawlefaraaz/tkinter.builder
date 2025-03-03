@@ -1,78 +1,71 @@
 import tkinter as tk
 
-class Attributes:
-    def __init__(self, widget) -> None:
-        self.widget = widget
 
-    def retrive_widget_attributes(self) -> dict:
-        remove_attributes_tuple = ("class", "colormap", "container", "visual", "bg", "bd", "fg", "screen", "use", )
-        
-        attribute = self.widget.keys()
-        attribute_value = [f"{self.widget.cget(i)}" for i in attribute]
-        attributes_dict = dict(zip(attribute, attribute_value))
-        
-        ### Remove Some Attributes
-        for key in remove_attributes_tuple: attributes_dict.pop(key, None)
-        
-        return attributes_dict
+def retrive_widget_attributes(widget) -> dict:
+    remove_attributes_tuple = ("class", "colormap", "container", "visual", "bg", "bd", "fg", "screen", "use", )
+    
+    attributes_dict = {option:str(value[-1]) for option, value in widget.configure().items() if option not in remove_attributes_tuple}
+    return attributes_dict
 
-    def retrive_pack_attributes(self) -> dict:
-        if self.widget.winfo_manager() != "pack":
-            try:
-                self.widget.pack()
-            except Exception as exception:
-                # Grid is already used to manage master's child
-                return
+def retrive_pack_attributes(widget) -> dict:
+    if widget.winfo_manager() != "pack":
+        try:
+            widget.pack()
+        except Exception as exception:
+            # Grid is already used to manage master's child
+            return
 
-        pack_attributes = self.widget.pack_info()
+    pack_attributes = widget.pack_info()
 
-        return pack_attributes
+    return pack_attributes
 
-    def retrive_grid_attributes(self) -> dict:
+def retrive_grid_attributes(widget) -> dict:
 
-        if self.widget.winfo_manager() != "grid":
-            try:
-                self.widget.grid()
-            except Exception as exception:
-                # Pack is already used to manage master's child
-                return
+    if widget.winfo_manager() != "grid":
+        try:
+            widget.grid()
+        except Exception as exception:
+            # Pack is already used to manage master's child
+            return
 
-        grid_attributes = self.widget.grid_info()
+    grid_attributes = widget.grid_info()
 
-        return grid_attributes
+    return grid_attributes
 
-    def retrive_place_attributes(self) -> dict:
-        if self.widget.winfo_manager() != "place":
-            self.widget.place(x=0, y=0)
+def retrive_place_attributes(widget) -> dict:
+    if widget.winfo_manager() != "place":
+        widget.place(x=0, y=0)
 
-        place_attributes = self.widget.place_info()   
+    place_attributes = widget.place_info()   
 
-        return place_attributes
+    return place_attributes
     
 def create_widget(
         widget_class,
-        widget_name:str, 
         widget_master,
+        widget_name:str, 
+        **options
     ):  
-    w =widget_class(widget_master, name= widget_name)
 
-    if w.winfo_class().startswith("T") and widget_class != "Tk":
-        w.module = "ttk"
-    else:
-        w.module = "tk"
+    widget =widget_class(widget_master, name= widget_name, **options)
 
-    w.widget_option_changed_dict = {}
-    w.saved_code = {}
-    w.nametowidget('.').widget_list.insert(widget_master, w)
+    return widget
 
-    if w.winfo_class() not in ("tk", "Menu"):
-        w.mgr_option_changed_dict = {}
-        w.place(x=0, y=0)
-    else:
-        w.mgr_option_changed_dict = None
+def get_defaults(widget):
+    wclass = getattr(tk, widget.winfo_class())
+    mgr = widget.winfo_manager()
 
-    return w
+    if wclass != tk.OptionMenu:
+        wclass = wclass()
+    else: 
+         wclass = wclass(None, None, None)
+        
+    result = (retrive_widget_attributes(wclass), globals()[f"retrive_{mgr}_attributes"](wclass) if wclass.winfo_class() not in ("tk", "Menu") else None)
 
+    wclass.destroy()
+
+    return result
+    
 def get_widget_code(widget):
     widget_class = widget.winfo_class()
     master = widget.winfo_parent()
@@ -80,6 +73,9 @@ def get_widget_code(widget):
     var_name = name.replace("!", "")
 
     widget_attrs_code = ", ".join((f'{key}= "{value}"' for key, value in widget.widget_option_changed_dict.items()))
+    if name == "tk":
+        widget_CODE = "root = tk.Tk()\n"
+        return widget_CODE
     if master == ".": 
         master_name = "root"
     else: 
@@ -87,10 +83,10 @@ def get_widget_code(widget):
         
     if widget.module == "ttk": widget_class = widget_class[1:]
 
-    widget_CODE = f'''{var_name} = {widget.module}.{widget_class}({master_name}, name= "{name}", {widget_attrs_code})'''
-    print(widget_CODE)
+    widget_CODE = f'''{var_name} = {widget.module}.{widget_class}({master_name}, name= "{name}", {widget_attrs_code})\n'''
 
     return widget_CODE
+
 def get_mgr_code(widget):
     name = widget.winfo_name()
     var_name = name.replace("!", "")
@@ -101,23 +97,62 @@ def get_mgr_code(widget):
         return None
 
     mgr_attrs_code = ", ".join((f'{key}= "{value}"' for key, value in widget.mgr_option_changed_dict.items()))
-    mgr_CODE = f"{var_name}.{mgr}({mgr_attrs_code})" if mgr else None
+    mgr_CODE = f"{var_name}.{mgr}({mgr_attrs_code})\n" if mgr else None
     return mgr_CODE
     
-def demo():
-    root = tk.Tk()
+def attr_checker(widget):
+    if hasattr(widget, "module"): return
+    
+    if widget.winfo_class().startswith("T") and widget.winfo_class() != "Tk":
+        widget.module = "ttk"
+    else:
+        widget.module = "tk"
 
-    widget = tk.Label(root)
-    widget.pack()
-    frame = tk.Frame(root)
+    widget.widget_option_changed_dict = {}
+    widget.saved_code = {}
+    widget.scope = {}
+    
+    if widget.winfo_class() not in ("tk", "Menu"):
+        widget.mgr_option_changed_dict = {}
+    else:
+        widget.mgr_option_changed_dict = None
 
-    a = Attributes(frame)
-    a.retrive_widget_attributes()
-    a.retrive_pack_attributes()
-    a.retrive_grid_attributes()
-    a.retrive_place_attributes()
-    print(a.widget_to_code())
+def new_configure(widget, cnf=None, **options):
+    widget.widget_option_changed_dict.update(options)
+    return_options = widget.old_configure(cnf, **options)
+    widget.event_generate("<Configure>")
+    return return_options
+
+from types import MethodType
+def on_new_widgets(widget):
+    attr_checker(widget)
+
+    if not widget.winfo_manager() and widget.winfo_class() not in ("tk", "Menu"):
+        widget.place(x=0, y=0)
+
+    default_widget_attr_dict, default_mgr_attr_dict = get_defaults(widget)
+
+    changed_widged_attr_dict = {option: value for option, value in retrive_widget_attributes(widget).items() if default_widget_attr_dict.get(option) != value}
+
+    if default_mgr_attr_dict:
+        if default_mgr_attr_dict.get("x"): default_mgr_attr_dict.update({"x":None, "y":None})
+        mgr_info = globals()[f"retrive_{widget.winfo_manager()}_attributes"](widget)
+        changed_mgr_attr_dict = {option: value for option, value in mgr_info.items() if default_mgr_attr_dict.get(option) != value}
+
+    try:
+        widget.nametowidget('.').widget_list.insert(widget.winfo_parent(), widget)
+
+        c = MethodType(new_configure, widget)
+        
+        widget.old_configure = widget.configure
+        widget.old_config = widget.configure
+
+        widget.configure = c
+        widget.config = c
+
+        widget.widget_option_changed_dict.update(changed_widged_attr_dict)
+        widget.mgr_option_changed_dict.update(changed_mgr_attr_dict)
+    except: pass
 
 
-if __name__ == "__main__":
-    demo()
+            

@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+from utilities import on_new_widgets
 
 class WidgetList(ttk.Treeview):
     def __init__(self, master):
@@ -7,6 +8,8 @@ class WidgetList(ttk.Treeview):
         self.root = self.nametowidget('.')
         self.bind("<Double Button-1>", self.call_update_ui)
         self.heading('#0', text='Widget List', anchor="n")
+        
+        self.root.widget_list = self
     
     def call_update_ui(self, event):
         sel = self.focus()
@@ -19,6 +22,25 @@ class WidgetList(ttk.Treeview):
     
     def delete(self, widget):
         super().delete(widget)
+    
+    def get_children(self, item = None):
+        return super().get_children(item)
+
+    def refresh_widget_list(self):
+        self.get_all_widgets(self.root)
+    
+    def get_all_widgets(self, master):
+        if not master: return
+
+        for child in master.winfo_children():
+            if child.winfo_name() in ("method_window", "raise_method_window"): continue
+
+            try: 
+                self.insert(child.winfo_parent(), child)
+                on_new_widgets(child)
+                self.get_all_widgets(child)
+            except: pass
+
     
 if __name__=="__main__":
     root = tk.Tk()

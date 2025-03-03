@@ -2,29 +2,17 @@ import tkinter as tk
 from tkinter.ttk import Style
 
 from .option_treeview import OptionTreeview
-from utilities import Attributes, get_mgr_code, get_widget_code
+import utilities
 
 class OptionDisplay(tk.LabelFrame):
-    treecolumns = ("Attributes", "Value")
     def __init__(self, master, widget, **options):
         super().__init__(master, **options)
 
         s= Style(self)
         s.configure("Treeview", font="Courier 12")
         s.configure("Big.Treeview", rowheight= 50, font="Courier 15")
-
+        
         self.widget = widget
-
-        self.attribute_class = Attributes(widget)
-
-    def retrive_data_from_treeview(self) -> dict:
-        retrived_data = dict()
-
-        for tree_index in self.tree.get_children():
-            values = self.tree.item(tree_index, "values")
-            retrived_data.update({values[0]: values[1]})
-
-        return retrived_data
 
 class WidgetMetadata(OptionDisplay):
     def __init__(self, master, widget, metadata,**options):
@@ -36,22 +24,22 @@ class WidgetMetadata(OptionDisplay):
         self.tree.pack(fill="x")
         
         self.widget.bind("<Configure>", self.update_widget_code)
-        if len(self.tree.get_children()) == 5:
+        if len(self.tree.get_children()) == 6:
             self.widget.bind("<Configure>", self.update_mgr_code, "+")
     
     def update_widget_code(self, e): 
-        values = ("widget_code", get_widget_code(self.widget))
+        values = ("widget_code", utilities.get_widget_code(self.widget))
         self.tree.update_row(values=values, iid = self.tree.item("widget_code", "values")[0])
 
     def update_mgr_code(self, e):
-        values = ("manager_code", get_mgr_code(self.widget))
+        values = ("manager_code", utilities.get_mgr_code(self.widget))
         self.tree.update_row(values=values, iid = self.tree.item("manager_code", "values")[0])
 
 class WidgetOption(OptionDisplay):
     def __init__(self, master, widget, **options):
         super().__init__(master=master, widget=widget, **options)
     
-        data = self.attribute_class.retrive_widget_attributes()
+        data = utilities.retrive_widget_attributes(widget)
         self.tree = OptionTreeview(
             self,
             data=data,
@@ -133,9 +121,9 @@ class ManagerOption(OptionDisplay):
         manager = self.widget.winfo_manager()
         if manager:
             self.RadioSelectedVar.set(manager)
-            self.update_manager()
         else:
-            self.selected_place.invoke()
+            self.RadioSelectedVar.set("place")
+        self.update_manager()
 
     def update_manager(self):
         rows = self.tree.get_children()
@@ -143,9 +131,11 @@ class ManagerOption(OptionDisplay):
             self.tree.delete(item)
 
         manager_attributes = getattr(
-            self.attribute_class, f"retrive_{self.RadioSelectedVar.get()}_attributes"
-        )()
+            utilities, f"retrive_{self.RadioSelectedVar.get()}_attributes"
+        )(self.widget)
+
         self.widget.mgr_option_changed_dict.clear()
+        if self.RadioSelectedVar.get() == "place": self.widget.mgr_option_changed_dict.update(x=0, y=0)
         if manager_attributes != None:
             self.enable_treeview()
             for value in manager_attributes:

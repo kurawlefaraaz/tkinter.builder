@@ -15,7 +15,7 @@ class PopupEntry(tk.Toplevel):
         x,
         y,
         width,
-        height, entry_text,
+        height, def_value,
         **options
     ):  
         x += master.winfo_rootx()
@@ -24,13 +24,14 @@ class PopupEntry(tk.Toplevel):
         super().__init__(master)
         self.overrideredirect(1)
         self.geometry(f"{width}x{height}+{x}+{y}")
+        self.focusmodel("active")
         self.grab_set()
         
-        self.textvar = tk.StringVar(self, entry_text)
+        self.textvar = tk.StringVar(self, def_value)
         
         entry = tk.Entry(self, textvariable=self.textvar, **options)
         entry.pack(fill="both", expand=1)
-        entry.focus_set()
+        entry.focus()
         entry.select_range(0, "end")
         entry.icursor("end")
 
@@ -52,7 +53,7 @@ class PopupEntry(tk.Toplevel):
     def _exit(self, e=None):
         self.master.unbind("<MouseWheel>")
         self.destroy()
-
+    
 class EditableTreeview(ttk.Treeview):
     """Customized Treeview with editing feature
 
@@ -124,9 +125,9 @@ class EditableTreeview(ttk.Treeview):
             self.popup_y,
             self.popup_w,
             self.popup_h,
-            entry_text=self.current_cell_value,
-            justify="left",
+            def_value=self.current_cell_value,
             font= self.style.lookup(self.cget("style"), "font")).get()
+        
         return new_val
     
     def edit(self, e):

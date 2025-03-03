@@ -1,10 +1,10 @@
 import tkinter as tk
 
 class BorderedButton(tk.Button):
-    def __init__(self, master, text, command, font=None):
+    def __init__(self, master, name=None, text="", command=None, font=None):
         self.border_frame = tk.Frame(master, highlightthickness=2, borderwidth=0)
 
-        super().__init__(self.border_frame, text=text, command=command,  borderwidth=0, border=0, width=20, padx=0, pady=0, relief="flat", font=font)
+        super().__init__(self.border_frame, name=name, text=text, command=command,  borderwidth=0, border=0, width=20, padx=0, pady=0, relief="flat", font=font)
         self.set_colors()
         super().pack()
 

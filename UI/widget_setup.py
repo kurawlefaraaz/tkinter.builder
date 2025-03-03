@@ -76,15 +76,14 @@ class GetWidgetSetupData(tk.Frame):
         name_text = self.widget_name_entry.get().replace("Name: ", "")
 
         self.nametowidget(".").nametowidget(master_text) # Validating master
-        if name_text.find(" ") != -1 or name_text.find(".") != -1:
+        is_0_index_digit = name_text[0].isdigit() if len(name_text) else 0
+        if name_text.find(" ") != -1 or name_text.find(".") != -1 or is_0_index_digit:
             raise tk.TclError(f"Invalid Name: {name_text}")
         
         retry = 0
         if not master_text :
             self.widget_master_entry.indicate_error("Master Required!")
             return
-        elif not name_text: 
-            retry = askretrycancel("Warning", "Name attribute is empty, press cancel for default values.")
 
         if retry:
             return

@@ -24,8 +24,8 @@ tk_widget_dict = {
         "Scrollbar": tk.Scrollbar,
         "Scale": tk.Scale,
         "Message": tk.Message,
-        "Canvas": tk.Canvas,
-    }
+        "Canvas": tk.Canvas
+        }
 
 ttk_widget_dict = {
         "Button": ttk.Button,
@@ -49,7 +49,7 @@ ttk_widget_dict = {
     }
 
 class DropFrame(BorderedButton):
-    def __init__(self, master, frame, on_hide_func, on_show_func, font, text, symbol=("▼", "▲")):
+    def __init__(self, master,frame, on_hide_func, on_show_func, font, text, symbol=("▼", "▲"), name= None):
         self.frame_invisible_text ,self.frame_visible_text = f"{text} {symbol[0]}", f"{text} {symbol[1]}"
         self.frame = frame
         self.text = text
@@ -57,7 +57,7 @@ class DropFrame(BorderedButton):
         self.on_hide_func = on_hide_func
         self.on_show_func = on_show_func
 
-        super().__init__(master, text = self.frame_invisible_text, command=self.toggle, font=font)
+        super().__init__(master, name=name, text = self.frame_invisible_text, command=self.toggle, font=font)
     
     def _show_frame(self): 
         self.counter = 1
@@ -85,21 +85,21 @@ class WidgetCatalog(tk.Frame):
 
         catalog_title_btn_font = Font(self, family="TkDefaultFont", weight="bold", size= 15)
 
-        self.tk_widget_btn= DropFrame(btn_frame, self.tk_catalog_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Tk Widgets", font=catalog_title_btn_font)
-        self.tk_widget_btn.pack(padx=10, side="left", pady=5)
+        self.tk_widget_btn= DropFrame(btn_frame, self.tk_catalog_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Tk Widgets", font=catalog_title_btn_font, name="tk_button")
+        self.tk_widget_btn.grid(row=0, column=0, padx=10, pady=5)
 
-        self.execute_code_widget_btn= DropFrame(btn_frame, self.execute_code_catalog_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Execute Code", font=catalog_title_btn_font)
-        self.execute_code_widget_btn.pack(padx=10, side="left", pady=5)
+        self.ttk_widget_btn= DropFrame(btn_frame, self.ttk_catalog_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Ttk Widgets", font=catalog_title_btn_font, name="ttk_button")
+        self.ttk_widget_btn.grid(row=0, column=1, padx=10, pady=5)
 
-        self.widget_list_btn= DropFrame(btn_frame, self.widget_list_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Widget List", font=catalog_title_btn_font)
-        self.widget_list_btn.pack(padx=10, side="left", pady=5)
+        self.execute_code_widget_btn= DropFrame(btn_frame, self.execute_code_catalog_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Execute Code", font=catalog_title_btn_font, name="execute_button")
+        self.execute_code_widget_btn.grid(row=1, column=0, padx=10, pady=5)
 
-        self.ttk_widget_btn= DropFrame(btn_frame, self.ttk_catalog_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Ttk Widgets", font=catalog_title_btn_font)
-        self.ttk_widget_btn.pack(padx=10, side="left", pady=5)
+        self.widget_list_btn= DropFrame(btn_frame, self.widget_list_frame(), self._enable_drop_frames, self._disable_drop_frames, text="Widget List", font=catalog_title_btn_font, name="tk_button")
+        self.widget_list_btn.grid(row=1, column=1, padx=10, pady=5)
 
         btn_frame.pack()
 
-        self.pack(fill="x")
+        self.pack()
 
     def tk_catalog_frame(self):
         TK_Catalog_Frame = tk.Frame(self, name="tk_frame", bg='white', padx=10, pady=10)
@@ -121,11 +121,13 @@ class WidgetCatalog(tk.Frame):
 
     def widget_list_frame(self):
         frame = tk.Frame(self, name="widget_list_frame", background="white", padx=10, pady=10)
-        tk.Label(frame, text="Double click on the widget row to get Update UI", background="white").pack(anchor='w')
+        top = tk.Frame(frame, background="white")
         wl = WidgetList(frame)
-        self.nametowidget('.').widget_list = wl
-        wl.insert(None, self.nametowidget('.'))
+        tk.Label(top, text="Double click on the widget row to get Update UI", background="white").pack(side="left",anchor='w')
+        tk.Button(top, text="Refresh", background="white", command=wl.refresh_widget_list).pack(side="right",anchor='w')
+        top.pack(fill="x")
         wl.pack(fill="both")
+
         return frame
     
     def _GridWidget_catalog(self, FrameName, widget_dict):  # Creates Buttons for each widget in widget_dict.
@@ -148,14 +150,21 @@ class WidgetCatalog(tk.Frame):
             column += 1
     
     def _disable_drop_frames(self):
-        for widget in (self.tk_widget_btn, self.execute_code_widget_btn, self.ttk_widget_btn, self.widget_list_btn):
+        for widget in (self.tk_widget_btn, self.ttk_widget_btn, self.execute_code_widget_btn, self.widget_list_btn):
             if not widget.counter:
                 widget.configure(state="disabled")
     
     def _enable_drop_frames(self):
-        for widget in (self.tk_widget_btn, self.execute_code_widget_btn, self.ttk_widget_btn, self.widget_list_btn):
+        for widget in (self.tk_widget_btn, self.ttk_widget_btn, self.execute_code_widget_btn, self.widget_list_btn):
             widget.configure(state="normal")
     
+    def reinvoke_enable_button(self):
+        for widget in (self.tk_widget_btn, self.ttk_widget_btn, self.execute_code_widget_btn, self.widget_list_btn):
+            
+            if "▲" in widget.cget("text"): 
+                widget.invoke()
+                return
+            
     def on_widget_button_press(self, widget_class):
         creation_window = Creation_UI(self.master, widget_class=widget_class)
     

@@ -23,9 +23,6 @@ class NumberedText(Frame):
         self.number_widget()
         
         self.textarea.config(spacing1=0, spacing2=0, spacing3=1)
-
-        self.textarea.bind("<Control-BackSpace>", lambda e: self.wordDelete(e, "1.0", backword=1, forward=0))
-        self.textarea.bind("<Control-Delete>", lambda e: self.wordDelete(e, "end", backword=0, forward=1))
         
     def scroll_text(self):
         self.textarea = Text(self, relief="flat", font="times 15", wrap="none", undo=1)
@@ -57,17 +54,15 @@ class NumberedText(Frame):
         self.linenumber.yview_moveto(first)
         self.uniscrollbar.set(first, last)
     
-    def wordDelete(self, event, stopindex:str, backword:bool, forward:bool):
-        wordStart = self.textarea.search(pattern=r"\s", regexp=1, index="insert", stopindex=stopindex, backwards=backword, forwards=forward)
-        if wordStart is None or wordStart == "": return
+    def get(self, index1, index2=None):
+        return self.textarea.get(index1, index2)
+    
+    def delete(self, index1, index2=None):
+        self.textarea.delete(index1, index2)
 
-        if backword and not forward:
-            self.textarea.delete(wordStart, "insert")
-            return "break"
-        else:
-            self.textarea.delete("insert", wordStart)
+    def insert(self, index, chars, *args):
+        self.textarea.insert(index, chars, *args)
         
-
 class LineNumbers(Listbox):
     def __init__(self, master, textwidget, **options):
         super().__init__(master, **options)

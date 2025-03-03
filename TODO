@@ -1,0 +1,15 @@
+add tests in every package
+<!-- add WidgetList Treeview to MethodWindow Menubar -->
+<!-- modify create_widget function to add new item into the WidgetList -->
+<!-- modify delete_widget_func function to remove item from the WidgetList -->
+<!-- add Ablity to save & open projects  -->
+<!-- add File Menu into the Menubar with commands to save & open projects -->
+<!-- save executed code the the widgets.custom_code dict in the runtime -->
+<!-- add load and save commands into the menubar of executecode widget which would save to and load from the widget.custom_code dict -->
+<!-- # In color picker, Add an option to get Color using the cursor it self -->
+<!-- # Popup widget for Tkinter Variables, Menus, commnads -->
+<!-- # Optional: Specialized Popup widgets for each type of attributes -->
+# Add about 
+# MAKE DOCS FOR TKINTER BUILDER & TUTORIAL
+<!-- # add vertical & horizontal scrollbar to treeviews -->
+<!-- # While using this program, if bind is used, then use the add pararmeter as "+" -->

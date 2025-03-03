@@ -1,0 +1,5 @@
+colorpicker: activebg, activefg, bg,disabledfg, fg, highlightbg, highlightcolor, 
+
+OptionMenu: anchor, bitmap, compound, cursor, default, justify, relief, overrelief, state, wrap_lenght
+
+fontchooser: font

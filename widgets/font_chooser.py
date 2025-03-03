@@ -3,9 +3,9 @@ from tkinter import Toplevel, StringVar, BooleanVar, IntVar, Frame, Button, Labe
 from tkinter.ttk import Combobox
 from tkinter.font import Font, families, names
 
-class SimpleFontChooser(Frame):
+class SimpleFontChooser(Toplevel):
     
-    def __init__(self, master, font:Font = None, text="Abcd", **options):
+    def __init__(self, master, font="TkDefault", **options):
         """
         Create a new FontChooser instance.
 
@@ -14,8 +14,7 @@ class SimpleFontChooser(Frame):
             master : Tk or Toplevel instance
                 master window
 
-            font : Font
-                ``Font`` object:
+            font : String
 
             text : str
                 text to be displayed in the preview label
@@ -27,15 +26,24 @@ class SimpleFontChooser(Frame):
                 additional keyword arguments to be passed to ``Toplevel.__init__``
         """
         super().__init__(master, **options)
+        self.grab_set()
         root = self.nametowidget(".")
         # --- family list
         self.font_list = list(set(families(root)).union(names(root)))
         self.font_list.sort()
+        self.font_list = tuple(ele.replace(" ", "\\") for ele in self.font_list)
 
         del root
+
+        font = font.split(" ")
+        self.font = Font(self, family=font[0])
+        for index, key in enumerate(font[1:], 1):
+            if index == 1: self.font.configure(size= key)
+            elif index == 2: self.font.configure(weight= key)
+            elif index == 3: self.font.configure(slant= key)
+            elif index == 4: self.font.configure(underline= 1)
+            elif index == 5: self.font.configure(overstrike= 1)
         
-        if not font: self.font = Font(self, font="TkDefaultFont")
-        else: self.font = font
 
         ### Font Family Select         
         self.font_family_option_selected = StringVar(self, self.font.cget('family'))
@@ -77,6 +85,7 @@ class SimpleFontChooser(Frame):
                            padx=10, pady=10, ipadx=10, sticky="ew")
     
         ### Preview Label
+        text = "Quick brown fox jumped over the lazy dogs."
         self.preview = Label(self, relief="groove",
                              text=text, font=self.font,
                              anchor="center", background="white")
@@ -118,13 +127,28 @@ class SimpleFontChooser(Frame):
         self.font.configure(overstrike=b)
     
     def cancel_func(self): 
+        self.destroy()
+
+    def ok_func(self): 
+        super().destroy()
+
+    def destroy(self):
         self.font = None
-        self.master.destroy()
-
-    def ok_func(self): self.master.destroy()
-
+        return super().destroy()
+    
     def get_result(self):
         return self.font
+
+    def get_str_result(self):
+        if not self.font: return None
+        font = f"{self.font.cget("family")} {self.font.cget("size")} {self.font.cget("weight")} {self.font.cget("slant")}"
+        if self.font['underline']:
+            font += ' underline'
+        if self.font['overstrike']:
+            font += ' overstrike'
+        
+        return font
+        
         
 def askfont(master=None, text="Abcd", title="Font Chooser", font=None):
     """
@@ -164,12 +188,9 @@ def askfont(master=None, text="Abcd", title="Font Chooser", font=None):
     Output: Font Object
 
     """
-    test = Toplevel(master)
-    test.title(title)
-    chooser = SimpleFontChooser(test, font, text)
-    chooser.pack()
+    chooser = SimpleFontChooser(master, font)
     chooser.wait_window(chooser)
-    return chooser.get_result()
+    return chooser.get_str_result()
 
 
 if __name__ == "__main__":
@@ -182,17 +203,10 @@ if __name__ == "__main__":
     label.pack(padx=10, pady=(10, 4))
 
     def callback():
-        font = askfont(root, title="Choose a font", text=label.cget('text'))
+        font = askfont(root, title="Choose a font: ", font="Times")
+        print(font)
         if font:
-            font_str = f"{font.cget('family')} {font.cget('size')} {font.cget('weight')} {font.cget('slant')}"
-            if font.cget('underline'):
-                font_str += ' underline'
-            if font.cget('overstrike'):
-                font_str += ' overstrike'
+            label.configure(font= font, text= f"Choose a font: {font}")
 
-            label.configure(font=font,
-                            text='Chosen font: ' + font_str)
-
-    Button(root, text='Font Chooser',
-           command=callback).pack(padx=10, pady=(4, 10))
+    Button(root, text='Font Chooser', command=callback).pack(padx=10, pady=(4, 10))
     root.mainloop()
