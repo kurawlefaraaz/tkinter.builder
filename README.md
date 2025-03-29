@@ -26,7 +26,7 @@ The lack of extensible and NO-XML Based GUI Creator for tkinter was the motivati
 
 (_Minimal Changes may be required for other versions_)
 
-##Tested:
+## Tested:
 1. Windows 10 along with Python 3.12 and Tkinter 8.6
 2. Linux Mint 22 along with Python 3.12 and Tkinter 8.6
 
