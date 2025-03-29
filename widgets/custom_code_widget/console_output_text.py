@@ -23,7 +23,7 @@ class Console(tk.Text):
         self.pressed_enter= tk.BooleanVar(self, 0)
         self.input_value = ""
 
-        self.bind("<Visibility>", self.set_stds)
+        if not self.nametowidget('.').testing: self.bind("<Visibility>", self.set_stds) 
 
     def set_stds(self, event):
         sys.stdout = event.widget

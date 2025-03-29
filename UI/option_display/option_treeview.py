@@ -42,6 +42,7 @@ class PopupEntry(tk.Entry):
         method_w.wm_protocol("WM_DELETE_WINDOW", "break")
 
         self.focus_set()
+        self.wait_visibility()
         self.grab_set()
         self.select_range(0, "end")
         # move cursor to the end

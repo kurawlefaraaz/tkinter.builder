@@ -1,4 +1,3 @@
-from os import listdir
+from tkinter_builder import GUI
 
-func_name = "listdir"
-print(locals()[func_name])
+GUI(1).mainloop()

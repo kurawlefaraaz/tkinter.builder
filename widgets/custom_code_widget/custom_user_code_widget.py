@@ -18,13 +18,12 @@ class ExecuteCodeFrame(tk.LabelFrame):
         pane = tk.PanedWindow(self, orient= "vertical", showhandle=1, sashpad=10, sashwidth=10, sashrelief='ridge', opaqueresize=0, background="white")
 
         self.textbox = NumberedText(master=pane)
-        # self.textbox.pack(padx=20, pady=5, fill="x")
-        pane.add(self.textbox, padx=10, pady=10, height=500)
+        pane.add(self.textbox, padx=10, pady=10, height=250)
 
         console = ReadOnlyConsole(master=pane)
-        pane.add(console, padx=10, pady=10, height=200)
+        pane.add(console, padx=10, pady=10, height=100)
 
-        pane.pack(padx=20, pady=5, fill="both")
+        pane.pack(padx=20, pady=5,side="top")
 
 class ExecuteCode(DynamicNotebook):
     def __init__(self, master, widget, **options):

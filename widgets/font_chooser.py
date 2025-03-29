@@ -26,6 +26,7 @@ class SimpleFontChooser(Toplevel):
                 additional keyword arguments to be passed to ``Toplevel.__init__``
         """
         super().__init__(master, **options)
+        self.wait_visibility()
         self.grab_set()
         root = self.nametowidget(".")
         # --- family list

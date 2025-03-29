@@ -57,7 +57,7 @@ class DropFrame(BorderedButton):
         self.on_hide_func = on_hide_func
         self.on_show_func = on_show_func
 
-        super().__init__(master, name=name, text = self.frame_invisible_text, command=self.toggle, font=font)
+        super().__init__(master, name=name, text = self.frame_invisible_text, command=self.toggle, font=font, width=20)
     
     def _show_frame(self): 
         self.counter = 1
@@ -142,7 +142,8 @@ class WidgetCatalog(tk.Frame):
                 FrameName,
                 text=key,
                 command=lambda widget_class=value: self.on_widget_button_press(widget_class=widget_class),
-                font=catalog_list_btn_font
+                font=catalog_list_btn_font,
+                width=12
             )
             btn.set_colors(foreground="#5185b4")
             btn.grid(row=row, column=column, padx=5, pady=5)

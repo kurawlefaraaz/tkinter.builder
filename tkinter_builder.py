@@ -6,10 +6,12 @@ from UI import MethodWindow, Updation_UI
 from utilities import on_new_widgets
 
 class GUI(tk.Tk):
-    def __init__(self):
+    def __init__(self, testing= 0):
         super().__init__()
 
-        self.report_callback_exception = self.loud_exceptions
+        self.testing = testing
+        
+        if not self.testing:  self.report_callback_exception = self.loud_exceptions
 
         self.title("Workspace")
         
@@ -21,7 +23,9 @@ class GUI(tk.Tk):
         self.mgr_option_changed_dict = None 
         self.saved_code = {}
         self.scope = {}
-
+        
+        self.last_touched_widget = self
+        
         self.add_method_window()
         self.update()
         

@@ -17,6 +17,7 @@ class BaseManager(Frame):
         self.master.resizable(1, 1)
         self.master.title(title)
 
+        
         self.master.nametowidget("widget_catalog").pack_forget()
         self.pack(fill="both", expand=1)
 
@@ -29,6 +30,8 @@ class BaseManager(Frame):
         master_name_path_code_dict = {"class": widget.winfo_class(), "master": widget.winfo_parent(), "name": widget.winfo_name(),'path': widget._w, "widget_code": utilities.get_widget_code(widget)}
         if widget.mgr_option_changed_dict != None:
             master_name_path_code_dict.update({"manager_code": utilities.get_mgr_code(widget)})
+
+        self.nametowidget(".").last_touched_widget = widget
 
         main_pane = PanedWindow(self, orient= "horizontal", showhandle=1, sashpad=10, sashwidth=10, sashrelief='ridge', opaqueresize=0, background="white")
         

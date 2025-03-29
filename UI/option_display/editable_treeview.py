@@ -25,6 +25,9 @@ class PopupEntry(tk.Toplevel):
         self.overrideredirect(1)
         self.geometry(f"{width}x{height}+{x}+{y}")
         self.focusmodel("active")
+        print("HEllo")
+        self.wait_visibility()
+        print("HEllo")
         self.grab_set()
         
         self.textvar = tk.StringVar(self, def_value)

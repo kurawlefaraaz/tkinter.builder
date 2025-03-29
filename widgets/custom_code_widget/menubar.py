@@ -24,7 +24,7 @@ class Menubar(FrameMenubar):
         self.file_menu()
         self.execute_code_menu()
 
-        self.pack(side="top", fill='x', padx=20, expand=1)
+        self.pack(side="top", fill='x', padx=20)
     
     def file_menu(self):
         self.file_menu = self.addMenubutton(text="Files", **self.parems)
@@ -98,7 +98,7 @@ class Menubar(FrameMenubar):
 
     def execute_command(self):
         textarea_content = self.master.textbox.get(0.0, "end")
-        exec(textarea_content,{"ROOT": self.root, "WIDGET": self.widget, "tk": tk, "ttk": ttk}, self.widget.scope)
+        exec(textarea_content,{"WIDGET": self.widget, "tk": tk, "ttk": ttk}, self.widget.scope)
         self.nametowidget('.').widget_list.refresh_widget_list()
         showinfo("Success", "Code is successfully executed", parent=self)
     

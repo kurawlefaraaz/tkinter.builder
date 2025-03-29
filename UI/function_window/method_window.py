@@ -21,4 +21,4 @@ class MethodWindow(Toplevel):
     
     def withdraw(self):
         super().withdraw()
-        Button(self.master, name= "raise_method_window", text=self.title(), font="courier 7 bold",command=self.deiconify, anchor="n").place(x=0, y=0, relx=0,rely=1, anchor="sw")
+        Button(self.master, name= "raise_method_window", text=self.title(), font="courier 7 bold",command=self.deiconify, anchor="n").place(x=0, y=0)
