@@ -30,4 +30,7 @@ The lack of extensible and NO-XML Based GUI Creator for tkinter was the motivati
 1. Windows 10 along with Python 3.12 and Tkinter 8.6
 2. Linux Mint 22 along with Python 3.12 and Tkinter 8.6
 
+## Usage:
+To use tkinter.builder with existing code, just replace `Tk()` of the code with the `GUI()` Class present in `tkinter_builder.py` file.
+
 For any query about tkinter.builder, feel free to mail kurawlefaraaz@gmail.com or raise issue.
